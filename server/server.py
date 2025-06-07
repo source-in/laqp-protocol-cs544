@@ -9,6 +9,9 @@ dfa = ServerDFA()
 
 class LAQPServerProtocol:
     def __init__(self, stream_id, quic, stream_reader, stream_writer):
+        """
+        Initializes the QUIC stream handler with stream details.
+        """
         self.stream_id = stream_id or 0
         self.quic = quic
         self.reader = stream_reader
@@ -16,6 +19,9 @@ class LAQPServerProtocol:
         self.client_id = None
 
     async def handle(self):
+        """
+        Handles incoming QUIC stream messages using a DFA to validate protocol flow.
+        """
         print(f"📶 Stream {self.stream_id} opened.")
         while True:
             data = await self.reader.read(1024)
@@ -40,6 +46,7 @@ class LAQPServerProtocol:
                 continue
 
             if msg_type == MSG_TYPE_REGISTER_REQUEST:
+                # Validate static API key from payload
                 if payload.decode() != DEFAULT_API_KEY:
                     print(f"❌ Invalid API key: {payload.decode()}")
                     self.writer.write(build_header(MSG_TYPE_ERROR_RESPONSE, payload=b"Invalid API Key"))
@@ -52,13 +59,14 @@ class LAQPServerProtocol:
                 await self.writer.drain()
 
             elif msg_type == MSG_TYPE_OPTION_NEGOTIATE_REQ:
+                # Assume gzip support for simplicity
                 print(f"🧠 Option negotiation from client {self.client_id}")
                 dfa.set_state(self.client_id, ClientState.NEGOTIATED)
                 self.writer.write(build_header(MSG_TYPE_ACKNOWLEDGEMENT, payload=b"compression:gzip"))
                 await self.writer.drain()
 
             elif msg_type == MSG_TYPE_LOG_MESSAGE:
-                print(f"📥 Received log from client {self.client_id}")
+                print(f"📅 Received log from client {self.client_id}")
                 self.writer.write(build_header(MSG_TYPE_ACKNOWLEDGEMENT))
                 await self.writer.drain()
 
@@ -68,11 +76,17 @@ class LAQPServerProtocol:
                 await self.writer.drain()
 
 async def handle_stream(stream_reader, stream_writer):
+    """
+    Called on each incoming QUIC stream to launch the protocol handler.
+    """
     print("🔗 New QUIC stream opened.")
     protocol = LAQPServerProtocol(stream_id=0, quic=None, stream_reader=stream_reader, stream_writer=stream_writer)
     await protocol.handle()
 
 async def main():
+    """
+    Starts the QUIC server with TLS configuration.
+    """
     config = QuicConfiguration(is_client=False)
     config.load_cert_chain("certs/cert.pem", "certs/key.pem")
     print("🚀 LAQP Server starting on 127.0.0.1:9000...")
