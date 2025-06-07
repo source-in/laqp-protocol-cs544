@@ -12,7 +12,7 @@ This project implements a reliable and extensible **Log Aggregation Protocol** o
 
 ---
 
-## 💪 Features Implemented
+## 📊 Features Implemented
 
 ### ✅ QUIC-based Transport Layer
 
@@ -44,7 +44,7 @@ This project implements a reliable and extensible **Log Aggregation Protocol** o
 
 ---
 
-## 📆 Folder Structure
+## 📅 Folder Structure
 
 ```
 laqp/
@@ -61,49 +61,82 @@ laqp/
 │   └── key.pem
 ├── .gitignore
 ├── requirements.txt
+├── Makefile
 └── README.md
 ```
 
 ---
 
-## 🛡️ Certificate Setup (QUIC over TLS)
+## 💻 Setup & Execution
 
-Generate a self-signed certificate for testing:
-
-```bash
-mkdir certs
-openssl req -newkey rsa:2048 -nodes -keyout certs/key.pem -x509 -days 365 -out certs/cert.pem
-```
-
-Use `localhost` as the Common Name (CN) during setup.
-
----
-
-## 💪 Installation
-
-### 1. Clone the repository
+### ♻️ 1. Clone the Repository
 
 ```bash
 git clone <your-repo-url>
 cd laqp
 ```
 
-### 2. Create and activate a virtual environment (recommended)
+---
+
+## ⚙️ 2. Quick Setup using Makefile (Recommended)
+
+If you are using **Linux/macOS/WSL**, you can use the included `Makefile` to automate the setup and execution:
+
+### 🛠️ First-Time Setup (Generate certs, install dependencies, run server & client)
+
+```bash
+make
+```
+
+> This will:
+>
+> - Create a virtual environment
+> - Install Python dependencies
+> - Generate TLS certificates under `certs/`
+
+> - After this run the below command in 2 seperate terminals.
+
+### ↺ Start Server Only
+
+```bash
+make server
+```
+
+### 🛈 Run Client Only
+
+```bash
+make client
+```
+
+### 🛁 Clean Environment
+
+```bash
+make clean
+```
+
+---
+
+## ⚡ 3. Manual Setup & Run (if not using Makefile)
+
+### Create & Activate Virtual Environment
 
 ```bash
 python3 -m venv venv
 source venv/bin/activate   # On Windows: venv\Scripts\activate
 ```
 
-### 3. Install required packages
+### Install Requirements
 
 ```bash
 pip install -r requirements.txt
 ```
 
----
+### Generate TLS Certificates
 
-## 🚀 Running the Project
+```bash
+mkdir certs
+openssl req -newkey rsa:2048 -nodes -keyout certs/key.pem -x509 -days 365 -out certs/cert.pem -subj "/CN=localhost"
+```
 
 ### Start Server
 
@@ -116,8 +149,6 @@ PYTHONPATH=. python server/server.py
 ```bash
 PYTHONPATH=. python client/client.py
 ```
-
-Ensure both are run from the root directory of the project.
 
 ---
 
