@@ -1,0 +1,19 @@
+
+venv/
+ENV/
+env/
+.venv/
+.idea/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Certificates (optional - keep if certs are sensitive or generated locally)
+certs/
